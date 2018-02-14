@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace digit_app.BLE
+namespace DigitAppCore.BLE
 {
     public class CTSConverter
     {

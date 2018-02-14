@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" IgnorableNamespaces="uap mp">
-  <Identity Name="93fd2ee8-b67a-4524-abcd-8c9fedb9c9df" Publisher="CN=raphael" Version="1.0.0.0" />
-  <mp:PhoneIdentity PhoneProductId="93fd2ee8-b67a-4524-abcd-8c9fedb9c9df" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
+  <Identity Name="40812RHS.digit-app" Publisher="CN=1E2F3EEE-5E63-42E0-84B9-FF7D9CBBDB5B" Version="1.1.0.0" />
+  <mp:PhoneIdentity PhoneProductId="3c25189e-2080-411d-b07b-670cb897826b" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
     <DisplayName>digit-app</DisplayName>
-    <PublisherDisplayName>raphael</PublisherDisplayName>
+    <PublisherDisplayName>RHS</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
   <Dependencies>
@@ -20,10 +20,34 @@
         </uap:DefaultTile>
         <uap:SplashScreen Image="Assets\SplashScreen.png" />
       </uap:VisualElements>
+      <Extensions>
+        <Extension Category="windows.backgroundTasks" EntryPoint="DigitBackgroundTasks.BatteryNotificationTask">
+          <BackgroundTasks>
+            <Task Type="bluetooth" />
+          </BackgroundTasks>
+        </Extension>
+        <Extension Category="windows.backgroundTasks" EntryPoint="DigitBackgroundTasks.PushBackgroundTask">
+          <BackgroundTasks>
+            <Task Type="pushNotification" />
+          </BackgroundTasks>
+        </Extension>
+        <Extension Category="windows.backgroundTasks" EntryPoint="DigitBackgroundTasks.DeviceConnectionBackgroundTask">
+          <BackgroundTasks>
+            <Task Type="deviceConnectionChange" />
+          </BackgroundTasks>
+        </Extension>
+        <Extension Category="windows.backgroundTasks" EntryPoint="DigitBackgroundTasks.AdvertimesmentWatcherTask">
+          <BackgroundTasks>
+            <Task Type="bluetooth" />
+            <uap:Task Type="phoneCall" />
+          </BackgroundTasks>
+        </Extension>
+      </Extensions>
     </Application>
   </Applications>
   <Capabilities>
     <Capability Name="internetClient" />
     <DeviceCapability Name="bluetooth" />
+    <DeviceCapability Name="location" />
   </Capabilities>
 </Package>
