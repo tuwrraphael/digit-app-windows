@@ -8,5 +8,6 @@ namespace DigitAppCore
         public DateTime LogTime { get; set; }
         public int Code { get; set; }
         public string Message { get; set; }
+        public string Author { get; set; }
     }
 }

@@ -34,12 +34,34 @@ namespace digit_app
                 var result = await hub.RegisterNativeAsync(channel.Uri);
                 if (result.RegistrationId != null)
                 {
+                    try //retry here because it's one of the calls where the user is active
+                    {
+                        await client.SetupPushChannel(result.RegistrationId);
+                    }
+                    catch (UnauthorizedException)
+                    {
+                        await client.Authenticate();
+                        try
+                        {
+                            await client.SetupPushChannel(result.RegistrationId);
+                        }
+                        catch (UnauthorizedException e)
+                        {
+                            await client.LogAsync($"Authorization error while push channel registration: {e.Message}", 3);
+                            return;
+                        }
+                    }
+                    catch (DigitServiceException s)
+                    {
+                        await client.LogAsync($"Failed to register notification channel: {s.Message}", 3);
+                        return;
+                    }
                     localSettings.Values["PushChannelUri"] = channel.Uri;
-                    await client.LogAsync($"Successfully registered notification channel {result.RegistrationId}");
+                    await client.LogAsync($"Successfully registered notification channel {result.RegistrationId}", 1);
                 }
                 else
                 {
-                    await client.LogAsync($"Failed to register notification channel", -1);
+                    await client.LogAsync($"Failed to register channel at hub", -1);
                 }
             }
         }

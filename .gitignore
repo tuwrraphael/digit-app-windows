@@ -261,3 +261,4 @@ __pycache__/
 *.pyc
 /digit-app/config.resw
 /DigitAppCore/coreconfig.resw
+/DigitAppCore/DigitServiceClientConfig.cs

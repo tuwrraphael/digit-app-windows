@@ -2,7 +2,6 @@
 using System;
 using System.Threading.Tasks;
 using Windows.Web.Http;
-using Windows.Web.Http.Headers;
 
 namespace DigitAppCore
 {
@@ -10,18 +9,18 @@ namespace DigitAppCore
     {
         private const string DeviceId = "12345";
         private string digitServiceClientUrl;
-        public DigitServiceClient()
+
+        private OpenIdApiClient idClient;
+
+        public DigitServiceClient() : this(DigitServiceClientConfig.Default)
         {
-            var configResources = Windows.ApplicationModel.Resources.ResourceLoader.GetForCurrentView("coreconfig");
-            digitServiceClientUrl = configResources.GetString("DigitServiceClientUrl");
+
         }
 
-        private HttpClient GetClient()
+        public DigitServiceClient(IDigitServiceClientConfig clientConfig)
         {
-            HttpClient client = new HttpClient();
-            client.DefaultRequestHeaders.Accept.Add(new HttpMediaTypeWithQualityHeaderValue("application/json"));
-            client.DefaultRequestHeaders.Accept.Add(new HttpMediaTypeWithQualityHeaderValue("text/javascript"));
-            return client;
+            idClient = new OpenIdApiClient(clientConfig.OpenIdConfig);
+            digitServiceClientUrl = clientConfig.DigitServiceClientUrl;
         }
 
         public async Task<bool> LogAsync(string message, int code = 0)
@@ -30,12 +29,51 @@ namespace DigitAppCore
             {
                 Code = code,
                 Message = message,
-                OccurenceTime = DateTime.Now
+                OccurenceTime = DateTime.Now,
+                Author = "digitApp"
             });
-            var client = GetClient();
+            var client = idClient.DefaultClient();
             HttpStringContent content = new HttpStringContent(json, Windows.Storage.Streams.UnicodeEncoding.Utf8, "application/json");
             HttpResponseMessage res = await client.PostAsync(new Uri($"{digitServiceClientUrl}/api/device/{DeviceId}/log"), content);
             return res.IsSuccessStatusCode;
+        }
+
+        public async Task SetupPushChannel(string uri)
+        {
+            var json = JsonConvert.SerializeObject(new PushChannelRegistration()
+            {
+                Uri = uri
+            });
+            var client = await idClient.GetAuthorizedClient();
+            HttpStringContent content = new HttpStringContent(json, Windows.Storage.Streams.UnicodeEncoding.Utf8, "application/json");
+            HttpResponseMessage res = await client.PostAsync(new Uri($"{digitServiceClientUrl}/api/push"), content);
+            var dat = await res.Content.ReadAsStringAsync();
+            if (res.StatusCode == HttpStatusCode.Unauthorized)
+            {
+                throw new UnauthorizedException("Not authorized to register push channel");
+            }
+            if (!res.IsSuccessStatusCode)
+            {
+                throw new DigitServiceException($"Push channel registration error {res.StatusCode}");
+            }
+        }
+
+        public async Task<bool> HasValidAccessToken()
+        {
+            try
+            {
+                await idClient.GetAuthorizedClient();
+            }
+            catch (UnauthorizedException)
+            {
+                return false;
+            }
+            return true;
+        }
+
+        public async Task Authenticate()
+        {
+            await idClient.AuthenticateClient();
         }
     }
 }

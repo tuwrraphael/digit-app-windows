@@ -104,8 +104,13 @@ namespace digit_app
             }
         }
 
-        protected override void OnNavigatedTo(NavigationEventArgs e)
+        protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
+            var client = new DigitServiceClient();
+            if (!await client.HasValidAccessToken())
+            {
+                await client.Authenticate();
+            }     
             var man = new BackgroundManager();
             man.RegisterPushChannel();
             man.RegisterPushBackgroundTask();

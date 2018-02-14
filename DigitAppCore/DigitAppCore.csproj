@@ -112,9 +112,17 @@
     <Compile Include="DigitBLEClient.cs" />
     <Compile Include="DigitBLEOptions.cs" />
     <Compile Include="DigitServiceClient.cs" />
+    <Compile Include="DigitServiceClientConfig.cs" />
+    <Compile Include="DigitServiceException.cs" />
     <Compile Include="GattConfigurationException.cs" />
+    <Compile Include="IDigitServiceClientConfig.cs" />
     <Compile Include="LogEntry.cs" />
+    <Compile Include="OpenIdApiClient.cs" />
+    <Compile Include="OpenIdApiClientConfig.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PushChannelRegistration.cs" />
+    <Compile Include="TokenResponse.cs" />
+    <Compile Include="UnauthorizedException.cs" />
     <EmbeddedResource Include="Properties\DigitAppCore.rd.xml" />
   </ItemGroup>
   <ItemGroup>
@@ -124,9 +132,6 @@
     <PackageReference Include="Newtonsoft.Json">
       <Version>10.0.3</Version>
     </PackageReference>
-  </ItemGroup>
-  <ItemGroup>
-    <PRIResource Include="coreconfig.resw" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
