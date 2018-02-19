@@ -83,7 +83,7 @@ namespace DigitAppCore
                     var token = JsonConvert.DeserializeObject<TokenResponse>(str);
                     localSettings.Values[AccessTokenKey] = token.access_token;
                     var expiration = DateTime.Now.AddSeconds(token.expires_in);
-                    localSettings.Values[AccessTokenExpiresKey] = expiration;
+                    localSettings.Values[AccessTokenExpiresKey] = expiration.ToString(CultureInfo.InvariantCulture);
                     accessToken = token.access_token;
                     accessTokenExpiration = expiration;
                     client.DefaultRequestHeaders.Authorization = new HttpCredentialsHeaderValue("Bearer", accessToken);

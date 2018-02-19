@@ -46,10 +46,13 @@ namespace digit_app
             deviceWatcher.Added += async (s, args) =>
             await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
-                var dev = Devices.SingleOrDefault(p => args.Id == p.Id);
-                if (null == dev)
+                if (args.Name == "Digit")
                 {
-                    Devices.Add(new BluetoothLEDeviceDisplay(args));
+                    var dev = Devices.SingleOrDefault(p => args.Id == p.Id);
+                    if (null == dev)
+                    {
+                        Devices.Add(new BluetoothLEDeviceDisplay(args));
+                    }
                 }
             });
             deviceWatcher.Removed += async (s, args) =>
@@ -82,7 +85,7 @@ namespace digit_app
                 await client.LogAsync($"Selected device {selected.Id} as digit.");
                 var man = new BackgroundManager();
                 man.RegisterDeviceConnectionBackgroundTask(selected.Id);
-                var bleClient = new DigitBLEClient(opts);
+                /*var bleClient = new DigitBLEClient(opts);
                 var res = await bleClient.SubscribeToBatteryCharacteristicAsync();
                 if (res == Windows.Devices.Bluetooth.GenericAttributeProfile.GattCommunicationStatus.Success)
                 {
@@ -100,7 +103,7 @@ namespace digit_app
                 catch (DigitBLEExpcetion ex)
                 {
                     await client.LogAsync($"Error while registering battery notification task {ex.Message}");
-                }
+                }*/
             }
         }
 
@@ -115,6 +118,8 @@ namespace digit_app
             man.RegisterPushChannel();
             man.RegisterPushBackgroundTask();
             man.RegisterAdvertisementWatcherTask();
+            man.RegisterGeolocationTasks();
+            man.RegisterTimeTriggerTask();
         }
     }
 }

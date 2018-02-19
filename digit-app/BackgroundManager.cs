@@ -2,7 +2,9 @@
 using DigitBackgroundTasks;
 using Microsoft.WindowsAzure.Messaging;
 using System;
+using System.Linq;
 using Windows.ApplicationModel.Background;
+using Windows.Devices.Geolocation;
 using Windows.Networking.PushNotifications;
 using Windows.Storage;
 
@@ -69,13 +71,8 @@ namespace digit_app
 
         public async void RegisterPushBackgroundTask()
         {
-            foreach (var task in BackgroundTaskRegistration.AllTasks)
-            {
-                if (task.Value.Name == nameof(PushBackgroundTask))
-                {
-                    return;
-                }
-            }
+            if (BackgroundTaskRegistration.AllTasks.Any(p => p.Value.Name == nameof(PushBackgroundTask)))
+                return;
             var builder = new BackgroundTaskBuilder
             {
                 Name = nameof(PushBackgroundTask),
@@ -132,6 +129,41 @@ namespace digit_app
             builder.SetTrigger(trigger);
             BackgroundTaskRegistration t = builder.Register();
             await client.LogAsync($"Successfully registered battery notification task");
+        }
+
+        public async void RegisterGeolocationTasks()
+        {
+            var access = await Geolocator.RequestAccessAsync();
+            if (access != GeolocationAccessStatus.Allowed)
+            {
+                await client.LogAsync($"Geolocation Access Denied.", 3);
+            }
+            //if (!BackgroundTaskRegistration.AllTasks.Any(p => p.Value.Name == nameof(VisitsBackgroundTask)))
+            //{
+            //    var builder = new BackgroundTaskBuilder
+            //    {
+            //        Name = nameof(VisitsBackgroundTask),
+            //        TaskEntryPoint = typeof(VisitsBackgroundTask).FullName
+            //    };
+            //    builder.SetTrigger(new GeovisitTrigger());
+            //    BackgroundTaskRegistration t = builder.Register();
+            //    await client.LogAsync($"Successfully registered geovisit trigger task.", 1);
+            //}
+        }
+
+        public async void RegisterTimeTriggerTask()
+        {
+            if (!BackgroundTaskRegistration.AllTasks.Any(p => p.Value.Name == nameof(TimeTriggerBackgroundTask)))
+            {
+                var builder = new BackgroundTaskBuilder
+                {
+                    Name = nameof(TimeTriggerBackgroundTask),
+                    TaskEntryPoint = typeof(TimeTriggerBackgroundTask).FullName
+                };
+                builder.SetTrigger(new TimeTrigger(15, false));
+                BackgroundTaskRegistration t = builder.Register();
+                await client.LogAsync($"Successfully registered time trigger task.", 1);
+            }
         }
     }
 }

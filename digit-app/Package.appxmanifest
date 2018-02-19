@@ -21,14 +21,21 @@
         <uap:SplashScreen Image="Assets\SplashScreen.png" />
       </uap:VisualElements>
       <Extensions>
-        <Extension Category="windows.backgroundTasks" EntryPoint="DigitBackgroundTasks.BatteryNotificationTask">
+        <Extension Category="windows.backgroundTasks" EntryPoint="DigitBackgroundTasks.TimeTriggerBackgroundTask">
           <BackgroundTasks>
-            <Task Type="bluetooth" />
+            <Task Type="systemEvent" />
+            <Task Type="timer" />
           </BackgroundTasks>
         </Extension>
-        <Extension Category="windows.backgroundTasks" EntryPoint="DigitBackgroundTasks.PushBackgroundTask">
+        <Extension Category="windows.backgroundTasks" EntryPoint="DigitBackgroundTasks.VisitsBackgroundTask">
           <BackgroundTasks>
-            <Task Type="pushNotification" />
+            <Task Type="systemEvent" />
+            <Task Type="location" />
+          </BackgroundTasks>
+        </Extension>
+        <Extension Category="windows.backgroundTasks" EntryPoint="DigitBackgroundTasks.AdvertimesmentWatcherTask">
+          <BackgroundTasks>
+            <Task Type="bluetooth" />
           </BackgroundTasks>
         </Extension>
         <Extension Category="windows.backgroundTasks" EntryPoint="DigitBackgroundTasks.DeviceConnectionBackgroundTask">
@@ -36,10 +43,14 @@
             <Task Type="deviceConnectionChange" />
           </BackgroundTasks>
         </Extension>
-        <Extension Category="windows.backgroundTasks" EntryPoint="DigitBackgroundTasks.AdvertimesmentWatcherTask">
+        <Extension Category="windows.backgroundTasks" EntryPoint="DigitBackgroundTasks.PushBackgroundTask">
+          <BackgroundTasks>
+            <Task Type="pushNotification" />
+          </BackgroundTasks>
+        </Extension>
+        <Extension Category="windows.backgroundTasks" EntryPoint="DigitBackgroundTasks.BatteryNotificationTask">
           <BackgroundTasks>
             <Task Type="bluetooth" />
-            <uap:Task Type="phoneCall" />
           </BackgroundTasks>
         </Extension>
       </Extensions>
