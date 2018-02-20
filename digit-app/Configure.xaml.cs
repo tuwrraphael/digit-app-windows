@@ -82,10 +82,21 @@ namespace digit_app
                 var opts = new DigitBLEOptions();
                 opts.StoreDeviceId(selected.Id);
                 DigitId = selected.Id;
-                await client.LogAsync($"Selected device {selected.Id} as digit.");
+                var bleClient = new DigitBLEClient(opts);
+                bool paired = false;
+                try
+                {
+                    paired = await bleClient.Pair();
+                }
+                catch (DigitBLEExpcetion ex)
+                {
+                    await client.LogAsync($"Pairing failed: {ex.Message}", 3);
+                }
+                var pairInformation = paired ? "(paired)" : "";
+                await client.LogAsync($"Selected device {selected.Id} as digit{pairInformation}.");
                 var man = new BackgroundManager();
                 man.RegisterDeviceConnectionBackgroundTask(selected.Id);
-                /*var bleClient = new DigitBLEClient(opts);
+                /*
                 var res = await bleClient.SubscribeToBatteryCharacteristicAsync();
                 if (res == Windows.Devices.Bluetooth.GenericAttributeProfile.GattCommunicationStatus.Success)
                 {
@@ -113,7 +124,7 @@ namespace digit_app
             if (!await client.HasValidAccessToken())
             {
                 await client.Authenticate();
-            }     
+            }
             var man = new BackgroundManager();
             man.RegisterPushChannel();
             man.RegisterPushBackgroundTask();

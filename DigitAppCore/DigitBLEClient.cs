@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Windows.ApplicationModel.Background;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
+using Windows.Devices.Enumeration;
 
 namespace DigitAppCore
 {
@@ -74,6 +75,21 @@ namespace DigitAppCore
         {
             var chars = await GetBatteryCharacteristicAsync();
             return new GattCharacteristicNotificationTrigger(chars);
+        }
+
+        public async Task<bool> Pair()
+        {
+            var bluetoothLeDevice = await DeviceInformation.CreateFromIdAsync(options.DeviceId);
+            if (!bluetoothLeDevice.Pairing.IsPaired)
+            {
+                var pairingStatus = await bluetoothLeDevice.Pairing.PairAsync();
+                if (pairingStatus.Status != DevicePairingResultStatus.Paired)
+                {
+                    throw new DigitBLEExpcetion("Could not pair");
+                }
+                return true;
+            }
+            return false;
         }
     }
 }

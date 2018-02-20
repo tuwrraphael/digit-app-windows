@@ -32,22 +32,22 @@ namespace DigitBackgroundTasks
                     {
                         await client.LogAsync($"BLE error: ${e.Message}", 3);
                     }
-                    try
-                    {
-                        var res = await bleClient.SubscribeToBatteryCharacteristicAsync();
-                        if (res == Windows.Devices.Bluetooth.GenericAttributeProfile.GattCommunicationStatus.Success)
-                        {
-                            await client.LogAsync($"Subscribed to battery characteristic", 1);
-                        }
-                        else
-                        {
-                            await client.LogAsync($"Error subscribing to battery characterisitc", 3);
-                        }
-                    }
-                    catch (DigitBLEExpcetion e)
-                    {
-                        await client.LogAsync($"BLE error: ${e.Message}", 3);
-                    }
+                    //try
+                    //{
+                    //    var res = await bleClient.SubscribeToBatteryCharacteristicAsync();
+                    //    if (res == Windows.Devices.Bluetooth.GenericAttributeProfile.GattCommunicationStatus.Success)
+                    //    {
+                    //        await client.LogAsync($"Subscribed to battery characteristic", 1);
+                    //    }
+                    //    else
+                    //    {
+                    //        await client.LogAsync($"Error subscribing to battery characterisitc", 3);
+                    //    }
+                    //}
+                    //catch (DigitBLEExpcetion e)
+                    //{
+                    //    await client.LogAsync($"BLE error: ${e.Message}", 3);
+                    //}
                 }
             }
             else
