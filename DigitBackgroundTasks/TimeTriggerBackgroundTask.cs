@@ -14,8 +14,12 @@ namespace DigitBackgroundTasks
             var client = new DigitServiceClient();
             var stored = (ApplicationData.Current.LocalSettings.Values["TimeTrigger"] as int?);
             var times = stored.HasValue ? (stored.Value + 1) : 1;
+
             ApplicationData.Current.LocalSettings.Values["TimeTrigger"] = times;
-            await client.LogAsync($"Time trigged background task ran (times: {times}).");
+            if (times % 8 == 0)
+            {
+                await client.LogAsync($"Time trigged background task ran (times: {times}).");
+            }
             _deferral.Complete();
         }
     }
