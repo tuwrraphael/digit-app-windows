@@ -21,6 +21,7 @@
                     <TextBlock>
                         IsPaired: <Run Text="{x:Bind IsPaired, Mode=OneWay}"/>, IsConnected: <Run Text="{x:Bind IsConnected, Mode=OneWay}"/>, IsConnectable:<Run Text="{x:Bind IsConnectable, Mode=OneWay}"/>
                     </TextBlock>
+                    <Button Click="Button_Click_1">Gerät auswählen</Button>
                 </StackPanel>
             </Grid>
         </DataTemplate>
@@ -31,23 +32,19 @@
             </RowDefinition>
             <RowDefinition>
             </RowDefinition>
-            <RowDefinition>
-            </RowDefinition>
         </Grid.RowDefinitions>
         <TextBlock Grid.Row="0" Style="{StaticResource TitleTextBlockStyle}" Text="Konfiguration" />
         <StackPanel Grid.Row="1">
             <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Text="Digit verbinden" />
-            <Button Click="Button_Click">Geräte auflisten</Button>
+            <StackPanel Orientation="Horizontal">
+                <Button Click="Button_Click">Geräte auflisten</Button>
+                <Button Click="Button_Click_2">Aufgaben konfigurieren</Button>
+            </StackPanel>
             <ScrollViewer VerticalScrollMode="Auto" VerticalScrollBarVisibility="Auto" >
                 <ListView x:Name="ResultsListView"
                       ItemTemplate="{StaticResource ResultsListViewTemplate}"
                       ItemsSource="{x:Bind Devices, Mode=OneWay}"/>
             </ScrollViewer>
-            <Button Click="Button_Click_1">Gerät auswählen</Button>
-        </StackPanel>
-        <StackPanel Grid.Row="2">
-            <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Text="Digit" />
-            <TextBlock Text="{x:Bind DigitId}"></TextBlock>
         </StackPanel>
     </Grid>
 </Page>

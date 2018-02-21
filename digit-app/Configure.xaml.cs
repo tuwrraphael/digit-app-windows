@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Net.NetworkInformation;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
 using Windows.Devices.Enumeration;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
@@ -119,7 +120,7 @@ namespace digit_app
             }
         }
 
-        protected override async void OnNavigatedTo(NavigationEventArgs e)
+        private async Task ConfigureTasks()
         {
             bool isInternetConnected = NetworkInterface.GetIsNetworkAvailable();
             if (!isInternetConnected)
@@ -155,6 +156,17 @@ namespace digit_app
                     await client.LogAsync("Background tasks disabled", 3);
                 }
             }
+            
+        } 
+
+        protected override async void OnNavigatedTo(NavigationEventArgs e)
+        {
+            await ConfigureTasks();
+        }
+
+        private async void Button_Click_2(object sender, RoutedEventArgs e)
+        {
+            await ConfigureTasks();
         }
     }
 }

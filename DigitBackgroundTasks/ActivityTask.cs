@@ -1,6 +1,8 @@
 ﻿using DigitAppCore;
+using System.Linq;
 using Windows.ApplicationModel.Background;
 using Windows.Devices.Sensors;
+using Windows.Storage;
 
 namespace DigitBackgroundTasks
 {
@@ -12,11 +14,37 @@ namespace DigitBackgroundTasks
         {
             _deferral = taskInstance.GetDeferral();
             var data = (ActivitySensorTriggerDetails)taskInstance.TriggerDetails;
-            var reports = data.ReadReports();
-            var client = new DigitServiceClient();
-            foreach (var report in reports)
+            var last = data.ReadReports().OrderByDescending(p => p.Reading.Timestamp).FirstOrDefault();
+            var stored = (ApplicationData.Current.LocalSettings.Values["Activity"] as ActivityType?);
+            if (null == last)
             {
-                await client.LogAsync($"{report.Reading.Activity} Confidence {report.Reading.Confidence} at {report.Reading.Timestamp}");
+                ActivityType activity = ActivityType.Idle;
+                bool known = true;
+                switch (last.Reading.Activity)
+                {
+                    case ActivityType.Fidgeting:
+                    case ActivityType.Idle:
+                    case ActivityType.Stationary:
+                        activity = ActivityType.Idle;
+                        break;
+                    case ActivityType.Biking:
+                    case ActivityType.InVehicle:
+                        activity = ActivityType.InVehicle;
+                        break;
+                    case ActivityType.Walking:
+                    case ActivityType.Running:
+                        activity = ActivityType.Walking;
+                        break;
+                    default:
+                        known = false;
+                        break;
+                }
+                if (known && (!stored.HasValue || stored.Value != activity))
+                {
+                    var client = new DigitServiceClient();
+                    await client.LogAsync($"{last.Reading.Activity} Confidence {last.Reading.Confidence} at {last.Reading.Timestamp}");
+                    ApplicationData.Current.LocalSettings.Values["Activity"] = activity;
+                }
             }
             _deferral.Complete();
         }
