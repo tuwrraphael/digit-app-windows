@@ -21,10 +21,29 @@
         <uap:SplashScreen Image="Assets\SplashScreen.png" />
       </uap:VisualElements>
       <Extensions>
-        <Extension Category="windows.backgroundTasks" EntryPoint="DigitBackgroundTasks.TimeTriggerBackgroundTask">
+        <Extension Category="windows.backgroundTasks" EntryPoint="DigitBackgroundTasks.ActivityTask">
           <BackgroundTasks>
-            <Task Type="systemEvent" />
-            <Task Type="timer" />
+            <Task Type="general" />
+          </BackgroundTasks>
+        </Extension>
+        <Extension Category="windows.backgroundTasks" EntryPoint="DigitBackgroundTasks.BatteryNotificationTask">
+          <BackgroundTasks>
+            <Task Type="bluetooth" />
+          </BackgroundTasks>
+        </Extension>
+        <Extension Category="windows.backgroundTasks" EntryPoint="DigitBackgroundTasks.PushBackgroundTask">
+          <BackgroundTasks>
+            <Task Type="pushNotification" />
+          </BackgroundTasks>
+        </Extension>
+        <Extension Category="windows.backgroundTasks" EntryPoint="DigitBackgroundTasks.DeviceConnectionBackgroundTask">
+          <BackgroundTasks>
+            <Task Type="deviceConnectionChange" />
+          </BackgroundTasks>
+        </Extension>
+        <Extension Category="windows.backgroundTasks" EntryPoint="DigitBackgroundTasks.AdvertimesmentWatcherTask">
+          <BackgroundTasks>
+            <Task Type="bluetooth" />
           </BackgroundTasks>
         </Extension>
         <Extension Category="windows.backgroundTasks" EntryPoint="DigitBackgroundTasks.VisitsBackgroundTask">
@@ -33,24 +52,10 @@
             <Task Type="location" />
           </BackgroundTasks>
         </Extension>
-        <Extension Category="windows.backgroundTasks" EntryPoint="DigitBackgroundTasks.AdvertimesmentWatcherTask">
+        <Extension Category="windows.backgroundTasks" EntryPoint="DigitBackgroundTasks.TimeTriggerBackgroundTask">
           <BackgroundTasks>
-            <Task Type="bluetooth" />
-          </BackgroundTasks>
-        </Extension>
-        <Extension Category="windows.backgroundTasks" EntryPoint="DigitBackgroundTasks.DeviceConnectionBackgroundTask">
-          <BackgroundTasks>
-            <Task Type="deviceConnectionChange" />
-          </BackgroundTasks>
-        </Extension>
-        <Extension Category="windows.backgroundTasks" EntryPoint="DigitBackgroundTasks.PushBackgroundTask">
-          <BackgroundTasks>
-            <Task Type="pushNotification" />
-          </BackgroundTasks>
-        </Extension>
-        <Extension Category="windows.backgroundTasks" EntryPoint="DigitBackgroundTasks.BatteryNotificationTask">
-          <BackgroundTasks>
-            <Task Type="bluetooth" />
+            <Task Type="systemEvent" />
+            <Task Type="timer" />
           </BackgroundTasks>
         </Extension>
       </Extensions>
@@ -60,5 +65,6 @@
     <Capability Name="internetClient" />
     <DeviceCapability Name="bluetooth" />
     <DeviceCapability Name="location" />
+	<DeviceCapability Name="activity" />
   </Capabilities>
 </Package>

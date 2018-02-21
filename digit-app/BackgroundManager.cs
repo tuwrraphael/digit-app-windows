@@ -3,8 +3,11 @@ using DigitBackgroundTasks;
 using Microsoft.WindowsAzure.Messaging;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Windows.ApplicationModel.Background;
+using Windows.Devices.Enumeration;
 using Windows.Devices.Geolocation;
+using Windows.Devices.Sensors;
 using Windows.Networking.PushNotifications;
 using Windows.Storage;
 
@@ -164,6 +167,40 @@ namespace digit_app
                 BackgroundTaskRegistration t = builder.Register();
                 await client.LogAsync($"Successfully registered time trigger task.", 1);
             }
+        }
+
+        public async void RegisterActivityTriggerTask()
+        {
+            var deviceAccessInfo = DeviceAccessInformation.CreateFromDeviceClassId(new Guid("9D9E0118-1807-4F2E-96E4-2CE57142E196"));
+            if (deviceAccessInfo.CurrentStatus == DeviceAccessStatus.Allowed)
+            {
+                if (!BackgroundTaskRegistration.AllTasks.Any(p => p.Value.Name == nameof(ActivityTask)))
+                {
+                    var builder = new BackgroundTaskBuilder
+                    {
+                        Name = nameof(ActivityTask),
+                        TaskEntryPoint = typeof(ActivityTask).FullName
+                    };
+                    var trigger = new ActivitySensorTrigger((uint)new TimeSpan(0,5,0).TotalMilliseconds);
+                    foreach (var act in trigger.SupportedActivities)
+                    {
+                        trigger.SubscribedActivities.Add(act);
+                    }
+                    builder.SetTrigger(trigger);
+                    BackgroundTaskRegistration t = builder.Register();
+                    await client.LogAsync($"Successfully registered activity trigger task.", 1);
+                }
+            }
+            else
+            {
+                await client.LogAsync($"Activity Sensor not allowed", 3);
+            }
+        }
+
+        public async Task<bool> CheckAccess()
+        {
+            var status = await BackgroundExecutionManager.RequestAccessAsync();
+            return status == BackgroundAccessStatus.AlwaysAllowed || status == BackgroundAccessStatus.AllowedSubjectToSystemPolicy;
         }
     }
 }

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Devices.Enumeration;
 using Windows.Foundation;
@@ -120,17 +121,40 @@ namespace digit_app
 
         protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
-            var client = new DigitServiceClient();
-            if (!await client.HasValidAccessToken())
+            bool isInternetConnected = NetworkInterface.GetIsNetworkAvailable();
+            if (!isInternetConnected)
             {
-                await client.Authenticate();
+                ContentDialog noWifiDialog = new ContentDialog
+                {
+                    Title = "No Network connection",
+                    Content = "Check your connection and try again.",
+                    CloseButtonText = "Ok"
+                };
+                ContentDialogResult result = await noWifiDialog.ShowAsync();
             }
-            var man = new BackgroundManager();
-            man.RegisterPushChannel();
-            man.RegisterPushBackgroundTask();
-            man.RegisterAdvertisementWatcherTask();
-            man.RegisterGeolocationTasks();
-            man.RegisterTimeTriggerTask();
+            else
+            {
+                var client = new DigitServiceClient();
+                if (!await client.HasValidAccessToken())
+                {
+                    await client.Authenticate();
+                }
+
+                var man = new BackgroundManager();
+                if (await man.CheckAccess())
+                {
+                    man.RegisterPushChannel();
+                    man.RegisterPushBackgroundTask();
+                    man.RegisterAdvertisementWatcherTask();
+                    man.RegisterGeolocationTasks();
+                    man.RegisterTimeTriggerTask();
+                    man.RegisterActivityTriggerTask();
+                }
+                else
+                {
+                    await client.LogAsync("Background tasks disabled", 3);
+                }
+            }
         }
     }
 }
