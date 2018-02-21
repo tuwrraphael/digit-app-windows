@@ -1,4 +1,5 @@
 ﻿using DigitAppCore;
+using System;
 using System.Linq;
 using Windows.ApplicationModel.Background;
 using Windows.Devices.Sensors;
@@ -13,10 +14,17 @@ namespace DigitBackgroundTasks
         public async void Run(IBackgroundTaskInstance taskInstance)
         {
             _deferral = taskInstance.GetDeferral();
+            var client = new DigitServiceClient();
             var data = (ActivitySensorTriggerDetails)taskInstance.TriggerDetails;
-            var last = data.ReadReports().OrderByDescending(p => p.Reading.Timestamp).FirstOrDefault();
-            var stored = (ApplicationData.Current.LocalSettings.Values["Activity"] as ActivityType?);
-            if (null == last)
+            var reports = data.ReadReports();
+            var last = reports.OrderByDescending(p => p.Reading.Timestamp).FirstOrDefault();
+            var storedString = ApplicationData.Current.LocalSettings.Values["Activity"] as string;
+            ActivityType? stored = null;
+            if (Enum.TryParse(storedString, out ActivityType output))
+            {
+                stored = output;
+            }
+            if (null != last)
             {
                 ActivityType activity = ActivityType.Idle;
                 bool known = true;
@@ -41,11 +49,11 @@ namespace DigitBackgroundTasks
                 }
                 if (known && (!stored.HasValue || stored.Value != activity))
                 {
-                    var client = new DigitServiceClient();
-                    await client.LogAsync($"{last.Reading.Activity} Confidence {last.Reading.Confidence} at {last.Reading.Timestamp}");
-                    ApplicationData.Current.LocalSettings.Values["Activity"] = activity;
+                    await client.LogAsync($"{activity}");
+                    ApplicationData.Current.LocalSettings.Values["Activity"] = activity.ToString();
                 }
             }
+            await client.LogAsync(string.Join("\n", reports.Select(r => $"{r.Reading.Activity} Confidence {r.Reading.Confidence} at {r.Reading.Timestamp}")));
             _deferral.Complete();
         }
     }
