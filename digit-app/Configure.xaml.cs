@@ -149,7 +149,7 @@ namespace digit_app
                     man.RegisterAdvertisementWatcherTask();
                     man.RegisterGeolocationTasks();
                     man.RegisterTimeTriggerTask();
-                    man.RegisterActivityTriggerTask();
+                    //man.RegisterActivityTriggerTask();
                 }
                 else
                 {
@@ -167,6 +167,13 @@ namespace digit_app
         private async void Button_Click_2(object sender, RoutedEventArgs e)
         {
             await ConfigureTasks();
+        }
+
+        private async void Button_Click_3(object sender, RoutedEventArgs e)
+        {
+            var opts = new DigitBLEOptions();
+            var bleClient = new DigitBLEClient(opts);
+            await bleClient.EnterBootloader();
         }
     }
 }

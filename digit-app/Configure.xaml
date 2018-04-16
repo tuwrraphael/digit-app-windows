@@ -37,8 +37,9 @@
         <StackPanel Grid.Row="1">
             <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Text="Digit verbinden" />
             <StackPanel Orientation="Horizontal">
-                <Button Click="Button_Click">Geräte auflisten</Button>
+                <Button Click="Button_Click">Geräte suchen</Button>
                 <Button Click="Button_Click_2">Aufgaben konfigurieren</Button>
+                <Button Click="Button_Click_3">Flash</Button>
             </StackPanel>
             <ScrollViewer VerticalScrollMode="Auto" VerticalScrollBarVisibility="Auto" >
                 <ListView x:Name="ResultsListView"

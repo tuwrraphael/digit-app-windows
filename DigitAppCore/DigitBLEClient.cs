@@ -91,5 +91,18 @@ namespace DigitAppCore
             }
             return false;
         }
+
+        public async Task EnterBootloader()
+        {
+            var bluetoothLeDevice = await BluetoothLEDevice.FromIdAsync(options.DeviceId);
+            var svc = (await bluetoothLeDevice.GetGattServicesForUuidAsync(new Guid("0000fe59-0000-1000-8000-00805f9b34fb")))
+            .Services.Single();
+            var chars = (await svc.GetCharacteristicsForUuidAsync(new Guid("8ec90003-f315-4f60-9fb8-838830daea50"))).Characteristics.Single();
+            await chars.WriteClientCharacteristicConfigurationDescriptorAsync(GattClientCharacteristicConfigurationDescriptorValue.Indicate);
+            byte[] data = { 0x01 };
+            //chars.ValueChanged += Chars_ValueChanged;
+            await chars.WriteValueAsync(data.AsBuffer());
+            return;
+        }
     }
 }
