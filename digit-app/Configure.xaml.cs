@@ -81,42 +81,35 @@ namespace digit_app
             var selected = ResultsListView.SelectedItem as BluetoothLEDeviceDisplay;
             if (null != selected)
             {
-                var opts = new DigitBLEOptions();
-                opts.StoreDeviceId(selected.Id);
-                DigitId = selected.Id;
-                var bleClient = new DigitBLEClient(opts);
-                bool paired = false;
+                bool claimed = false;
                 try
                 {
-                    paired = await bleClient.Pair();
+                    claimed = await client.ClaimDevice("12345");
                 }
-                catch (DigitBLEExpcetion ex)
+                catch (DigitServiceException exc)
                 {
-                    await client.LogAsync($"Pairing failed: {ex.Message}", 3);
+                    await client.LogAsync($"Could not claim device: ${exc.Message}");
                 }
-                var pairInformation = paired ? "(paired)" : "";
-                await client.LogAsync($"Selected device {selected.Id} as digit{pairInformation}.");
-                var man = new BackgroundManager();
-                man.RegisterDeviceConnectionBackgroundTask(selected.Id);
-                /*
-                var res = await bleClient.SubscribeToBatteryCharacteristicAsync();
-                if (res == Windows.Devices.Bluetooth.GenericAttributeProfile.GattCommunicationStatus.Success)
+                if (claimed)
                 {
-                    await client.LogAsync($"Subscribed to battery characteristic", 1);
+                    var opts = new DigitBLEOptions();
+                    opts.StoreDeviceId(selected.Id);
+                    DigitId = selected.Id;
+                    var bleClient = new DigitBLEClient(opts);
+                    bool paired = false;
+                    try
+                    {
+                        paired = await bleClient.Pair();
+                    }
+                    catch (DigitBLEExpcetion ex)
+                    {
+                        await client.LogAsync($"Pairing failed: {ex.Message}", 3);
+                    }
+                    var pairInformation = paired ? "(paired)" : "";
+                    await client.LogAsync($"Selected device {selected.Id} as digit{pairInformation}.");
+                    var man = new BackgroundManager();
+                    man.RegisterDeviceConnectionBackgroundTask(selected.Id);
                 }
-                else
-                {
-                    await client.LogAsync($"Error subscribing to battery characterisitc", 3);
-                }
-                try
-                {
-                    var trigger = await bleClient.CreateTriggerForBatteryStatusAsync();
-                    man.RegisterBatteryNotificationTask(trigger);
-                }
-                catch (DigitBLEExpcetion ex)
-                {
-                    await client.LogAsync($"Error while registering battery notification task {ex.Message}");
-                }*/
             }
         }
 
@@ -156,8 +149,8 @@ namespace digit_app
                     await client.LogAsync("Background tasks disabled", 3);
                 }
             }
-            
-        } 
+
+        }
 
         protected override async void OnNavigatedTo(NavigationEventArgs e)
         {

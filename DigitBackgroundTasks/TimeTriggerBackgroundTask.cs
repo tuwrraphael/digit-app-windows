@@ -1,6 +1,5 @@
 ﻿using DigitAppCore;
 using Windows.ApplicationModel.Background;
-using Windows.Storage;
 
 namespace DigitBackgroundTasks
 {
@@ -12,13 +11,12 @@ namespace DigitBackgroundTasks
         {
             _deferral = taskInstance.GetDeferral();
             var client = new DigitServiceClient();
-            var stored = (ApplicationData.Current.LocalSettings.Values["TimeTrigger"] as int?);
-            var times = stored.HasValue ? (stored.Value + 1) : 1;
-
-            ApplicationData.Current.LocalSettings.Values["TimeTrigger"] = times;
-            if (times % 8 == 0)
+            var opts = new DigitBLEOptions();
+            if (opts.IsConfigured)
             {
-                await client.LogAsync($"Time trigged background task ran (times: {times}).");
+                var bleClient = new DigitBLEClient(opts);
+                var batteryService = new BatteryService(bleClient, client);
+                await batteryService.AddBatteryMeasurement();
             }
             _deferral.Complete();
         }

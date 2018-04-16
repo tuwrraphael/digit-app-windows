@@ -60,13 +60,17 @@ namespace DigitAppCore
         }
 
 
-        public async Task<byte> ReadBatteryAsync()
+        public async Task<byte?> ReadBatteryAsync()
         {
             var chars = await GetBatteryCharacteristicAsync();
             var res = await chars.ReadValueAsync();
             if (res.Status == GattCommunicationStatus.Success)
             {
                 return new BatteryStatusConverter().GetValueFromBuffer(res.Value);
+            }
+            else if (res.Status == GattCommunicationStatus.Unreachable)
+            {
+                return null;
             }
             throw new DigitBLEExpcetion("Could not read battery status");
         }

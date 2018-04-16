@@ -1,8 +1,6 @@
 ﻿using DigitAppCore;
-using System;
 using Windows.ApplicationModel.Background;
 using Windows.Networking.PushNotifications;
-using Windows.Storage;
 
 namespace DigitBackgroundTasks
 {
@@ -16,27 +14,23 @@ namespace DigitBackgroundTasks
             RawNotification notification = (RawNotification)taskInstance.TriggerDetails;
             var client = new DigitServiceClient();
             await client.LogAsync($"Received push {notification.Content}");
-            var opts = new DigitBLEOptions();
-            if (opts.IsConfigured)
+            switch (notification.Content)
             {
-                var bleClient = new DigitBLEClient(opts);
-                try
-                {
-                    await bleClient.SetTime(DateTime.Now);
-                    var batt = await bleClient.ReadBatteryAsync();
-                    double calc = 3.6 * (batt / 100.0);
-                    await client.LogAsync($"Read battery: {batt} = {calc}V");
-                }
-                catch (DigitBLEExpcetion e)
-                {
-                    await client.LogAsync($"BLE error: ${e.Message}", 3);
-                }
+                case "measure_battery":
+                    var opts = new DigitBLEOptions();
+                    if (opts.IsConfigured)
+                    {
+                        var bleClient = new DigitBLEClient(opts);
+                        var batteryService = new BatteryService(bleClient, client);
+                        await batteryService.AddBatteryMeasurement();
+                    }
+                    else
+                    {
+                        await client.LogAsync($"Push error: no device configured.", 3);
+                    }
+                    break;
+                default: break;
             }
-            else
-            {
-                await client.LogAsync($"Push error: no device configured.", 3);
-            }
-
             _deferral.Complete();
         }
     }

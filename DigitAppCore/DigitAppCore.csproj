@@ -107,6 +107,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="AdvertisementWatcherManager.cs" />
+    <Compile Include="BatteryMeasurement.cs" />
+    <Compile Include="BatteryService.cs" />
     <Compile Include="BLE\BatteryStatusConverter.cs" />
     <Compile Include="BLE\CTSConverter.cs" />
     <Compile Include="DigitBLEClient.cs" />

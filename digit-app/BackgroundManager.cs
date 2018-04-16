@@ -163,7 +163,7 @@ namespace digit_app
                     Name = nameof(TimeTriggerBackgroundTask),
                     TaskEntryPoint = typeof(TimeTriggerBackgroundTask).FullName
                 };
-                builder.SetTrigger(new TimeTrigger(2*60, false));
+                builder.SetTrigger(new TimeTrigger(60, false));
                 BackgroundTaskRegistration t = builder.Register();
                 await client.LogAsync($"Successfully registered time trigger task.", 1);
             }

@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Threading.Tasks;
+using Windows.Storage.Streams;
 using Windows.Web.Http;
 
 namespace DigitAppCore
@@ -45,16 +46,44 @@ namespace DigitAppCore
                 Uri = uri
             });
             var client = await idClient.GetAuthorizedClient();
-            HttpStringContent content = new HttpStringContent(json, Windows.Storage.Streams.UnicodeEncoding.Utf8, "application/json");
+            HttpStringContent content = new HttpStringContent(json, UnicodeEncoding.Utf8, "application/json");
             HttpResponseMessage res = await client.PostAsync(new Uri($"{digitServiceClientUrl}/api/push"), content);
-            var dat = await res.Content.ReadAsStringAsync();
             if (res.StatusCode == HttpStatusCode.Unauthorized)
             {
-                throw new UnauthorizedException("Not authorized to register push channel");
+                throw new DigitServiceException("Not authorized to register push channel");
             }
             if (!res.IsSuccessStatusCode)
             {
                 throw new DigitServiceException($"Push channel registration error {res.StatusCode}");
+            }
+        }
+
+        public async Task<bool> ClaimDevice(string deviceId)
+        {
+            var client = await idClient.GetAuthorizedClient();
+            HttpResponseMessage res = await client.PostAsync(new Uri($"{digitServiceClientUrl}/api/device/{deviceId}/claim"),
+                new HttpStringContent("{}", UnicodeEncoding.Utf8, "application/json"));
+            if (res.StatusCode == HttpStatusCode.Unauthorized)
+            {
+                throw new DigitServiceException("Not authorized to claim device");
+            }
+            if (!res.IsSuccessStatusCode)
+            {
+                throw new DigitServiceException($"Claim device error: {res.StatusCode}");
+            }
+            return true;
+        }
+
+
+        public async Task PostBatteryMeasurement(string deviceId, BatteryMeasurement mes)
+        {
+            var json = JsonConvert.SerializeObject(mes);
+            var client = await idClient.GetAuthorizedClient();
+            HttpStringContent content = new HttpStringContent(json, UnicodeEncoding.Utf8, "application/json");
+            HttpResponseMessage res = await client.PostAsync(new Uri($"{digitServiceClientUrl}/api/device/{deviceId}/battery"), content);
+            if (!res.IsSuccessStatusCode)
+            {
+                throw new DigitServiceException($"Battery measurement post error {res.StatusCode}");
             }
         }
 
