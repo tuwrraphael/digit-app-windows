@@ -26,7 +26,8 @@ namespace DigitBackgroundTasks
                     var bleClient = new DigitBLEClient(opts);
                     try
                     {
-                        await bleClient.SetTime(DateTime.Now);
+                        var res = await bleClient.SetTime(DateTime.Now);
+                        await client.LogAsync($"CSent current time to watch: {res}", res == Windows.Devices.Bluetooth.GenericAttributeProfile.GattCommunicationStatus.Success ? 1 : 3);
                     }
                     catch (DigitBLEExpcetion e)
                     {

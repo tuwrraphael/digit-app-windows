@@ -22,7 +22,7 @@ namespace DigitAppCore
                 TaskEntryPoint = $"{Namespace}.{TaskName}"
             };
             var trigger = new BluetoothLEAdvertisementWatcherTrigger();
-            trigger.AdvertisementFilter.Advertisement.ServiceUuids.Add(DigitBLEClient.DigitServiceGuid);
+            trigger.AdvertisementFilter.Advertisement.LocalName = "Digit";
             builder.SetTrigger(trigger);
             BackgroundTaskRegistration t = builder.Register();
             return true;

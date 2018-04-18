@@ -63,7 +63,7 @@ namespace DigitAppCore
         public async Task<byte?> ReadBatteryAsync()
         {
             var chars = await GetBatteryCharacteristicAsync();
-            var res = await chars.ReadValueAsync();
+            var res = await chars.ReadValueAsync(BluetoothCacheMode.Uncached);
             if (res.Status == GattCommunicationStatus.Success)
             {
                 return new BatteryStatusConverter().GetValueFromBuffer(res.Value);

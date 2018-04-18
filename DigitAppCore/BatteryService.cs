@@ -14,7 +14,7 @@ namespace DigitAppCore
             this.digitServiceClient = digitServiceClient;
         }
 
-        public async Task AddBatteryMeasurement()
+        public async Task<bool> AddBatteryMeasurement()
         {
             try
             {
@@ -34,6 +34,7 @@ namespace DigitAppCore
                     try
                     {
                         await digitServiceClient.PostBatteryMeasurement("12345", measurement);
+                        return true;
                     }
                     catch (DigitServiceException e)
                     {
@@ -45,6 +46,7 @@ namespace DigitAppCore
             {
                 await digitServiceClient.LogAsync($"Could not read battery: {ex.Message}", 3);
             }
+            return false;
         }
     }
 }

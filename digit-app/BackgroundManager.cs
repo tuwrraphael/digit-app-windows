@@ -163,7 +163,7 @@ namespace digit_app
                     Name = nameof(TimeTriggerBackgroundTask),
                     TaskEntryPoint = typeof(TimeTriggerBackgroundTask).FullName
                 };
-                builder.SetTrigger(new TimeTrigger(60, false));
+                builder.SetTrigger(new TimeTrigger(120, false));
                 BackgroundTaskRegistration t = builder.Register();
                 await client.LogAsync($"Successfully registered time trigger task.", 1);
             }
@@ -181,7 +181,7 @@ namespace digit_app
                         Name = nameof(ActivityTask),
                         TaskEntryPoint = typeof(ActivityTask).FullName
                     };
-                    var trigger = new ActivitySensorTrigger((uint)new TimeSpan(0,5,0).TotalMilliseconds);
+                    var trigger = new ActivitySensorTrigger((uint)new TimeSpan(0, 5, 0).TotalMilliseconds);
                     foreach (var act in trigger.SupportedActivities)
                     {
                         trigger.SubscribedActivities.Add(act);
