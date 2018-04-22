@@ -110,6 +110,7 @@
     <Compile Include="AdvetisementWatcherTask.cs" />
     <Compile Include="BatteryNotificationTask.cs" />
     <Compile Include="DeviceConnectionBackgroundTask.cs" />
+    <Compile Include="DigitAdvertisementPacket.cs" />
     <Compile Include="PushBackgroundTask.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ActivityTask.cs" />

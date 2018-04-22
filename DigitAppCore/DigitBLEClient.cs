@@ -21,7 +21,7 @@ namespace DigitAppCore
             this.options = options;
         }
 
-        public async Task<GattCommunicationStatus> SetTime(DateTime dateTime)
+        public async Task SetTime(DateTime dateTime)
         {
             var bluetoothLeDevice = await BluetoothLEDevice.FromIdAsync(options.DeviceId);
             var svcs = (await bluetoothLeDevice.GetGattServicesAsync()).Services
@@ -30,9 +30,13 @@ namespace DigitAppCore
             {
                 byte[] data = new CTSConverter().Convert(dateTime);
                 var chars = await svcs.GetCharacteristicsAsync();
-                return await chars.Characteristics.First().WriteValueAsync(data.AsBuffer());
+                var result = await chars.Characteristics.First().WriteValueAsync(data.AsBuffer());
+                if (result != GattCommunicationStatus.Success)
+                {
+                    throw new DigitBLEExpcetion($"Write CTS failed: {result}");
+                }
             }
-            throw new DigitBLEExpcetion("Service not found");
+            throw new DigitBLEExpcetion("Write CTS failed: Service not found");
         }
 
         private async Task<GattCharacteristic> GetBatteryCharacteristicAsync()

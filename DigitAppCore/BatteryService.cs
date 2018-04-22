@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Windows.Storage;
 
 namespace DigitAppCore
 {
@@ -7,11 +8,34 @@ namespace DigitAppCore
     {
         private readonly DigitBLEClient digitBLEClient;
         private readonly DigitServiceClient digitServiceClient;
+        private const int EveryNthTime = 3;
+        private const string BatteryMeasurementTimerKey = "SendBattery";
 
         public BatteryService(DigitBLEClient digitBLEClient, DigitServiceClient digitServiceClient)
         {
             this.digitBLEClient = digitBLEClient;
             this.digitServiceClient = digitServiceClient;
+        }
+
+        public async Task<bool> TimeTriggeredMeasurement()
+        {
+            var stored = (ApplicationData.Current.LocalSettings.Values[BatteryMeasurementTimerKey] as int?);
+            var times = stored.HasValue ? (stored.Value - 1) : EveryNthTime;
+            bool measurementSuccessful = false;
+            if (times == 0)
+            {
+                if (measurementSuccessful = await AddBatteryMeasurement())
+                {
+                    times = EveryNthTime;
+                }
+                else
+                {
+                    times = 1;
+                }
+
+            }
+            ApplicationData.Current.LocalSettings.Values[BatteryMeasurementTimerKey] = times;
+            return measurementSuccessful;
         }
 
         public async Task<bool> AddBatteryMeasurement()
@@ -34,6 +58,7 @@ namespace DigitAppCore
                     try
                     {
                         await digitServiceClient.PostBatteryMeasurement("12345", measurement);
+                        ApplicationData.Current.LocalSettings.Values[BatteryMeasurementTimerKey] = EveryNthTime;
                         return true;
                     }
                     catch (DigitServiceException e)

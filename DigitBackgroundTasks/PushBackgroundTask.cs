@@ -1,4 +1,5 @@
 ﻿using DigitAppCore;
+using System;
 using Windows.ApplicationModel.Background;
 using Windows.Networking.PushNotifications;
 
@@ -14,22 +15,32 @@ namespace DigitBackgroundTasks
             RawNotification notification = (RawNotification)taskInstance.TriggerDetails;
             var client = new DigitServiceClient();
             await client.LogAsync($"Received push {notification.Content}");
-            switch (notification.Content)
+            var opts = new DigitBLEOptions();
+            if (opts.IsConfigured)
             {
-                case "measure_battery":
-                    var opts = new DigitBLEOptions();
-                    if (opts.IsConfigured)
-                    {
-                        var bleClient = new DigitBLEClient(opts);
+                var bleClient = new DigitBLEClient(opts);
+                switch (notification.Content)
+                {
+                    case "measure_battery":
                         var batteryService = new BatteryService(bleClient, client);
                         await batteryService.AddBatteryMeasurement();
-                    }
-                    else
-                    {
-                        await client.LogAsync($"Push error: no device configured.", 3);
-                    }
-                    break;
-                default: break;
+                        break;
+                    case "send_time":
+                        try
+                        {
+                            await bleClient.SetTime(DateTime.Now);
+                        }
+                        catch (DigitBLEExpcetion e)
+                        {
+                            await client.LogAsync($"Could not send time: {e.Message}", 3);
+                        }
+                        break;
+                    default: break;
+                }
+            }
+            else
+            {
+                await client.LogAsync($"Push error: no device configured.", 3);
             }
             _deferral.Complete();
         }
