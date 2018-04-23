@@ -1,4 +1,5 @@
 ﻿using DigitAppCore;
+using System;
 using Windows.ApplicationModel.Background;
 
 namespace DigitBackgroundTasks
@@ -11,12 +12,19 @@ namespace DigitBackgroundTasks
         {
             _deferral = taskInstance.GetDeferral();
             var client = new DigitServiceClient();
-            var opts = new DigitBLEOptions();
-            if (opts.IsConfigured)
+            try
             {
-                var bleClient = new DigitBLEClient(opts);
-                var batteryService = new BatteryService(bleClient, client);
-                await batteryService.TimeTriggeredMeasurement();
+                var opts = new DigitBLEOptions();
+                if (opts.IsConfigured)
+                {
+                    var bleClient = new DigitBLEClient(opts);
+                    var batteryService = new BatteryService(bleClient, client);
+                    await batteryService.TimeTriggeredMeasurement();
+                }
+            }
+            catch (Exception e)
+            {
+                await client.LogAsync($"Unhandled background exception: {e.Message}", 3);
             }
             _deferral.Complete();
         }
