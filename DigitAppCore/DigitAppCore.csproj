@@ -118,12 +118,15 @@
     <Compile Include="DigitServiceException.cs" />
     <Compile Include="GattConfigurationException.cs" />
     <Compile Include="IDigitServiceClientConfig.cs" />
+    <Compile Include="ITokenStorage.cs" />
     <Compile Include="LogEntry.cs" />
     <Compile Include="OpenIdApiClient.cs" />
     <Compile Include="OpenIdApiClientConfig.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PushChannelRegistration.cs" />
+    <Compile Include="StoredTokens.cs" />
     <Compile Include="TokenResponse.cs" />
+    <Compile Include="TokenStorage.cs" />
     <Compile Include="UnauthorizedException.cs" />
     <EmbeddedResource Include="Properties\DigitAppCore.rd.xml" />
   </ItemGroup>

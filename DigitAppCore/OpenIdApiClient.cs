@@ -1,86 +1,39 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Security.Authentication.Web;
-using Windows.Storage;
 using Windows.Web.Http;
 using Windows.Web.Http.Headers;
 
 namespace DigitAppCore
 {
-    public class OpenIdApiClient
+    public partial class OpenIdApiClient
     {
         private readonly string authorizationUrl;
-        private readonly string name;
         private readonly string clientId;
         private readonly string clientSecret;
         private readonly string scopes;
         private readonly string redirectUri;
-
-        private string AccessTokenKey => $"{name}ApiAccessToken";
-        private string RefreshTokenKey => $"{name}ApiRefreshToken";
-        private string AccessTokenExpiresKey => $"{name}ApiAccessTokenExpiration";
+        private readonly ITokenStorage tokenStorage;
 
         public OpenIdApiClient(OpenIdApiClientConfig config)
-        : this(config.Endpoint, config.Name, config.ClientId, config.ClientSecret, config.Scopes, config.RedirectUrl) { }
+        : this(config.Endpoint, config.ClientId, config.ClientSecret, config.Scopes, config.RedirectUrl, new TokenStorage(config.Name)) { }
 
-        public OpenIdApiClient(string authorizationUrl, string name, string clientId, string clientSecret, string scopes, string redirectUri)
+        public OpenIdApiClient(string authorizationUrl, string clientId, string clientSecret, string scopes, string redirectUri, ITokenStorage tokenStorage)
         {
             this.authorizationUrl = authorizationUrl;
-            this.name = name;
             this.clientId = clientId;
             this.clientSecret = clientSecret;
             this.scopes = scopes;
             this.redirectUri = redirectUri;
-
-        }
-
-        private class StoredTokens
-        {
-            public DateTime? AccessTokenExpires { get; set; }
-            public string AccessToken { get; set; }
-            public string RefreshToken { get; set; }
-
-            public bool Expired => null == AccessToken || !AccessTokenExpires.HasValue || AccessTokenExpires.Value < DateTime.Now;
-            public bool HasRefreshToken => null != RefreshToken;
+            this.tokenStorage = tokenStorage;
         }
 
         private static SemaphoreSlim accessTokenSem = new SemaphoreSlim(1);
-
-        private StoredTokens Tokens
-        {
-            get
-            {
-                var localSettings = ApplicationData.Current.LocalSettings;
-                var tokens = new StoredTokens()
-                {
-                    AccessToken = (localSettings.Values[AccessTokenKey] as string),
-                    RefreshToken = (localSettings.Values[RefreshTokenKey] as string)
-                };
-                if (localSettings.Values[AccessTokenExpiresKey] is string expiration
-                    && DateTime.TryParse(expiration, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime res))
-                {
-                    tokens.AccessTokenExpires = res;
-                }
-                return tokens;
-            }
-            set
-            {
-                var localSettings = ApplicationData.Current.LocalSettings;
-                localSettings.Values[AccessTokenKey] = value.AccessToken;
-                if (value.AccessTokenExpires.HasValue)
-                {
-                    localSettings.Values[AccessTokenExpiresKey] = value.AccessTokenExpires.Value.ToString(CultureInfo.InvariantCulture);
-                }
-                localSettings.Values[RefreshTokenKey] = value.RefreshToken;
-            }
-        }
-
 
         public HttpClient DefaultClient()
         {
@@ -94,7 +47,7 @@ namespace DigitAppCore
         {
             var client = DefaultClient();
             await accessTokenSem.WaitAsync();
-            var tokens = Tokens;
+            var tokens = await tokenStorage.Get();
             if (!tokens.Expired)
             {
                 client.DefaultRequestHeaders.Authorization = new HttpCredentialsHeaderValue("Bearer", tokens.AccessToken);
@@ -124,7 +77,7 @@ namespace DigitAppCore
                             RefreshToken = token.refresh_token,
                             AccessTokenExpires = DateTime.Now.AddSeconds(token.expires_in)
                         };
-                        Tokens = tokens;
+                        await tokenStorage.Store(tokens);
                         client.DefaultRequestHeaders.Authorization = new HttpCredentialsHeaderValue("Bearer", tokens.AccessToken);
                         return client;
                     }
@@ -186,7 +139,7 @@ namespace DigitAppCore
                             RefreshToken = token.refresh_token,
                             AccessTokenExpires = DateTime.Now.AddSeconds(token.expires_in)
                         };
-                        Tokens = tokens;
+                        await tokenStorage.Store(tokens);
                     }
                     else
                     {
