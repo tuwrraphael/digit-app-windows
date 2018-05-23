@@ -1,4 +1,6 @@
 ﻿using DigitAppCore;
+using DigitService.Client;
+using Microsoft.Extensions.Options;
 using System;
 using System.Linq;
 using Windows.ApplicationModel.Background;
@@ -14,7 +16,7 @@ namespace DigitBackgroundTasks
         public async void Run(IBackgroundTaskInstance taskInstance)
         {
             _deferral = taskInstance.GetDeferral();
-            var client = new DigitServiceClient();
+            var client = DigitServiceBuilder.Get();
             var data = (ActivitySensorTriggerDetails)taskInstance.TriggerDetails;
             var reports = data.ReadReports();
             var last = reports.OrderByDescending(p => p.Reading.Timestamp).FirstOrDefault();

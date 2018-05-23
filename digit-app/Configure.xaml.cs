@@ -1,4 +1,5 @@
 ﻿using DigitAppCore;
+using DigitService.Client;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -77,14 +78,14 @@ namespace digit_app
 
         private async void Button_Click_1(object sender, RoutedEventArgs e)
         {
-            var client = new DigitServiceClient();
+            var client = DigitServiceBuilder.Get();
             var selected = ResultsListView.SelectedItem as BluetoothLEDeviceDisplay;
             if (null != selected)
             {
                 bool claimed = false;
                 try
                 {
-                    claimed = await client.ClaimDevice("12345");
+                    claimed = await client.Device["12345"].Claim();
                 }
                 catch (DigitServiceException exc)
                 {
@@ -128,12 +129,12 @@ namespace digit_app
             }
             else
             {
-                var client = new DigitServiceClient();
-                if (!await client.HasValidAccessToken())
+                var authenticationProvider = DigitServiceBuilder.AuthenticationProvider();
+                if (!await authenticationProvider.HasValidAccessToken())
                 {
-                    await client.Authenticate();
+                    await authenticationProvider.AuthenticateUser();
                 }
-
+                var client = DigitServiceBuilder.Get();
                 var man = new BackgroundManager();
                 if (await man.CheckAccess())
                 {

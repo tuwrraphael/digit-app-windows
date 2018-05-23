@@ -18,7 +18,7 @@ namespace DigitBackgroundTasks
             _deferral = taskInstance.GetDeferral();
             var details = (GattCharacteristicNotificationTriggerDetails)taskInstance.TriggerDetails;
             var value = new BatteryStatusConverter().GetValueFromBuffer(details.Value);
-            var client = new DigitServiceClient();
+            var client = DigitServiceBuilder.Get();
             await client.LogAsync($"Battery notification. Value: {value}");
             _deferral.Complete();
         }

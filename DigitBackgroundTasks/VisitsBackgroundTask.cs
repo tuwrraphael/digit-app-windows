@@ -13,7 +13,7 @@ namespace DigitBackgroundTasks
         {
             _deferral = taskInstance.GetDeferral();
             GeovisitTriggerDetails visit = (GeovisitTriggerDetails)taskInstance.TriggerDetails;
-            var client = new DigitServiceClient();
+            var client = DigitServiceBuilder.Get();
             var reports = visit.ReadReports();
             var msg = string.Join("\n", reports.Select(r => $"{r.Timestamp} {r.StateChange} {r.Position.Coordinate.Point}").ToArray());
             await client.LogAsync($"Geovisit:\n{msg}");

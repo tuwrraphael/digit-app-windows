@@ -23,7 +23,7 @@ namespace DigitAppCore
                 var str = await FileIO.ReadTextAsync(tokenFile);
                 return JsonConvert.DeserializeObject<StoredTokens>(str);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return new StoredTokens();
             }

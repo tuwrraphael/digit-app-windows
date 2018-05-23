@@ -12,7 +12,7 @@ namespace DigitBackgroundTasks
         public async void Run(IBackgroundTaskInstance taskInstance)
         {
             _deferral = taskInstance.GetDeferral();
-            var client = new DigitServiceClient();
+            var client = DigitServiceBuilder.Get();
             try
             {
                 RawNotification notification = (RawNotification)taskInstance.TriggerDetails;

@@ -1,4 +1,6 @@
-﻿using System;
+﻿using DigitService.Client;
+using DigitService.Models;
+using System;
 using System.Threading.Tasks;
 using Windows.Storage;
 
@@ -7,11 +9,11 @@ namespace DigitAppCore
     public class BatteryService
     {
         private readonly DigitBLEClient digitBLEClient;
-        private readonly DigitServiceClient digitServiceClient;
+        private readonly IDigitServiceClient digitServiceClient;
         private const int EveryNthTime = 3;
         private const string BatteryMeasurementTimerKey = "SendBattery";
 
-        public BatteryService(DigitBLEClient digitBLEClient, DigitServiceClient digitServiceClient)
+        public BatteryService(DigitBLEClient digitBLEClient, IDigitServiceClient digitServiceClient)
         {
             this.digitBLEClient = digitBLEClient;
             this.digitServiceClient = digitServiceClient;
@@ -57,7 +59,7 @@ namespace DigitAppCore
                     };
                     try
                     {
-                        await digitServiceClient.PostBatteryMeasurement("12345", measurement);
+                        await digitServiceClient.Device["12345"].Battery.AddMeasurement(measurement);
                         ApplicationData.Current.LocalSettings.Values[BatteryMeasurementTimerKey] = EveryNthTime;
                         return true;
                     }

@@ -2,7 +2,7 @@
 {
     public interface IDigitServiceClientConfig
     {
-        OpenIdApiClientConfig OpenIdConfig { get; }
+        BearerTokenAuthenticationProviderOptions AuthenticationOptions { get; }
         string DigitServiceClientUrl { get; }
     }
 }

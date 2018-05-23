@@ -107,21 +107,19 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="AdvertisementWatcherManager.cs" />
-    <Compile Include="BatteryMeasurement.cs" />
     <Compile Include="BatteryService.cs" />
     <Compile Include="BLE\BatteryStatusConverter.cs" />
     <Compile Include="BLE\CTSConverter.cs" />
     <Compile Include="DigitBLEClient.cs" />
     <Compile Include="DigitBLEOptions.cs" />
-    <Compile Include="DigitServiceClient.cs" />
+    <Compile Include="DigitServiceBuilder.cs" />
     <Compile Include="DigitServiceClientConfig.cs" />
-    <Compile Include="DigitServiceException.cs" />
     <Compile Include="GattConfigurationException.cs" />
     <Compile Include="IDigitServiceClientConfig.cs" />
     <Compile Include="ITokenStorage.cs" />
     <Compile Include="LogEntry.cs" />
-    <Compile Include="OpenIdApiClient.cs" />
-    <Compile Include="OpenIdApiClientConfig.cs" />
+    <Compile Include="BearerTokenAuthenticationProvider.cs" />
+    <Compile Include="BearerTokenAuthenticationProviderOptions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PushChannelRegistration.cs" />
     <Compile Include="StoredTokens.cs" />
@@ -131,11 +129,11 @@
     <EmbeddedResource Include="Properties\DigitAppCore.rd.xml" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
-      <Version>6.0.4</Version>
+    <PackageReference Include="DigitService.Client">
+      <Version>1.0.1</Version>
     </PackageReference>
-    <PackageReference Include="Newtonsoft.Json">
-      <Version>10.0.3</Version>
+    <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
+      <Version>6.1.4</Version>
     </PackageReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">

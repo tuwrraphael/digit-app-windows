@@ -11,7 +11,7 @@ namespace DigitBackgroundTasks
         public async void Run(IBackgroundTaskInstance taskInstance)
         {
             _deferral = taskInstance.GetDeferral();
-            var client = new DigitServiceClient();
+            var client = DigitServiceBuilder.Get();
             try
             {
                 var opts = new DigitBLEOptions();

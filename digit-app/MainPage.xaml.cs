@@ -30,8 +30,6 @@ namespace digit_app
     /// </summary>
     public sealed partial class MainPage : Page
     {
-        private string deviceId;
-
         public MainPage()
         {
             this.InitializeComponent();

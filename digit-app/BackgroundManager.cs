@@ -1,5 +1,7 @@
 ﻿using DigitAppCore;
 using DigitBackgroundTasks;
+using DigitService.Client;
+using DigitService.Models;
 using Microsoft.WindowsAzure.Messaging;
 using System;
 using System.Linq;
@@ -7,7 +9,6 @@ using System.Threading.Tasks;
 using Windows.ApplicationModel.Background;
 using Windows.Devices.Enumeration;
 using Windows.Devices.Geolocation;
-using Windows.Devices.Sensors;
 using Windows.Networking.PushNotifications;
 using Windows.Storage;
 
@@ -18,7 +19,7 @@ namespace digit_app
         private readonly ApplicationDataContainer localSettings;
         private readonly string notificationHubName;
         private readonly string notificationHubEndpoint;
-        private readonly DigitServiceClient client;
+        private readonly IDigitServiceClient client;
 
         public BackgroundManager()
         {
@@ -26,7 +27,7 @@ namespace digit_app
             var configResources = Windows.ApplicationModel.Resources.ResourceLoader.GetForCurrentView("config");
             notificationHubName = configResources.GetString("NotificationHubName");
             notificationHubEndpoint = configResources.GetString("NotificationHubEndpoint");
-            client = new DigitServiceClient();
+            client = DigitServiceBuilder.Get();
         }
 
         public async void RegisterPushChannel()
@@ -39,16 +40,21 @@ namespace digit_app
                 var result = await hub.RegisterNativeAsync(channel.Uri);
                 if (result.RegistrationId != null)
                 {
+                    var pushChannelRegistration = new PushChannelRegistration()
+                    {
+                        Uri = result.RegistrationId
+                    };
                     try //retry here because it's one of the calls where the user is active
                     {
-                        await client.SetupPushChannel(result.RegistrationId);
+                        await client.SetupPushChannel(pushChannelRegistration);
                     }
                     catch (UnauthorizedException)
                     {
-                        await client.Authenticate();
+                        var authenticationProvider = DigitServiceBuilder.AuthenticationProvider();
+                        await authenticationProvider.AuthenticateUser();
                         try
                         {
-                            await client.SetupPushChannel(result.RegistrationId);
+                            await client.SetupPushChannel(pushChannelRegistration);
                         }
                         catch (UnauthorizedException e)
                         {

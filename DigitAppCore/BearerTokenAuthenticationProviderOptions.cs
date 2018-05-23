@@ -1,6 +1,6 @@
 ﻿namespace DigitAppCore
 {
-    public class OpenIdApiClientConfig
+    public class BearerTokenAuthenticationProviderOptions
     {
         public string Endpoint { get; set; }
         public string Name { get; set; }

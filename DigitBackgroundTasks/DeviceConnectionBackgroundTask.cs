@@ -13,7 +13,7 @@ namespace DigitBackgroundTasks
         {
             _deferral = taskInstance.GetDeferral();
             object trigger = taskInstance.TriggerDetails;
-            var client = new DigitServiceClient();
+            var client = DigitServiceBuilder.Get();
             var opts = new DigitBLEOptions();
             if (opts.IsConfigured)
             {

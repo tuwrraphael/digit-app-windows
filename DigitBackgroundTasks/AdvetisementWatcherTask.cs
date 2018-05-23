@@ -14,7 +14,7 @@ namespace DigitBackgroundTasks
         {
             _deferral = taskInstance.GetDeferral();
             var details = (BluetoothLEAdvertisementWatcherTriggerDetails)taskInstance.TriggerDetails;
-            var client = new DigitServiceClient();
+            var client = DigitServiceBuilder.Get();
             if (details.Advertisements != null && details.Advertisements.Count > 0)
             {
                 var packets = details.Advertisements.Select(v => new DigitAdvertisementPacket(v));
