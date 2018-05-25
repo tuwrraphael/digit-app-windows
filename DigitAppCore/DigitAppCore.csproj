@@ -117,6 +117,7 @@
     <Compile Include="GattConfigurationException.cs" />
     <Compile Include="IDigitServiceClientConfig.cs" />
     <Compile Include="ITokenStorage.cs" />
+    <Compile Include="LocationService.cs" />
     <Compile Include="LogEntry.cs" />
     <Compile Include="BearerTokenAuthenticationProvider.cs" />
     <Compile Include="BearerTokenAuthenticationProviderOptions.cs" />
@@ -130,7 +131,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="DigitService.Client">
-      <Version>1.0.1</Version>
+      <Version>1.0.4</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
       <Version>6.1.4</Version>

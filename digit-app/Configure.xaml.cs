@@ -79,13 +79,12 @@ namespace digit_app
         private async void Button_Click_1(object sender, RoutedEventArgs e)
         {
             var client = DigitServiceBuilder.Get();
-            var selected = ResultsListView.SelectedItem as BluetoothLEDeviceDisplay;
-            if (null != selected)
+            if (ResultsListView.SelectedItem is BluetoothLEDeviceDisplay selected)
             {
                 bool claimed = false;
                 try
                 {
-                    claimed = await client.Device["12345"].Claim();
+                    claimed = await client.Device["12345"].ClaimAsync();
                 }
                 catch (DigitServiceException exc)
                 {

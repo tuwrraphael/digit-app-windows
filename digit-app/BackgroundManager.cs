@@ -46,7 +46,7 @@ namespace digit_app
                     };
                     try //retry here because it's one of the calls where the user is active
                     {
-                        await client.SetupPushChannel(pushChannelRegistration);
+                        await client.SetupPushChannelAsync(pushChannelRegistration);
                     }
                     catch (UnauthorizedException)
                     {
@@ -54,7 +54,7 @@ namespace digit_app
                         await authenticationProvider.AuthenticateUser();
                         try
                         {
-                            await client.SetupPushChannel(pushChannelRegistration);
+                            await client.SetupPushChannelAsync(pushChannelRegistration);
                         }
                         catch (UnauthorizedException e)
                         {

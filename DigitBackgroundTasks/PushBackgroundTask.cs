@@ -1,4 +1,6 @@
 ﻿using DigitAppCore;
+using DigitService.Models;
+using Newtonsoft.Json;
 using System;
 using Windows.ApplicationModel.Background;
 using Windows.Networking.PushNotifications;
@@ -18,16 +20,28 @@ namespace DigitBackgroundTasks
                 RawNotification notification = (RawNotification)taskInstance.TriggerDetails;
                 await client.LogAsync($"Received push {notification.Content}");
                 var opts = new DigitBLEOptions();
-                if (opts.IsConfigured)
+
+
+                var content = JsonConvert.DeserializeObject<PushPayload>(notification.Content);
+                switch (content.Action)
                 {
-                    var bleClient = new DigitBLEClient(opts);
-                    switch (notification.Content)
-                    {
-                        case "measure_battery":
+                    case PushActions.MeasureBattery:
+                        if (opts.IsConfigured)
+                        {
+                            var bleClient = new DigitBLEClient(opts);
                             var batteryService = new BatteryService(bleClient, client);
                             await batteryService.AddBatteryMeasurement();
-                            break;
-                        case "send_time":
+
+                        }
+                        else
+                        {
+                            await client.LogAsync($"Push error: no device configured.", 3);
+                        }
+                        break;
+                    case PushActions.SendTime:
+                        if (opts.IsConfigured)
+                        {
+                            var bleClient = new DigitBLEClient(opts);
                             try
                             {
                                 await bleClient.SetTime(DateTime.Now);
@@ -36,13 +50,17 @@ namespace DigitBackgroundTasks
                             {
                                 await client.LogAsync($"Could not send time: {e.Message}", 3);
                             }
-                            break;
-                        default: break;
-                    }
-                }
-                else
-                {
-                    await client.LogAsync($"Push error: no device configured.", 3);
+                        }
+                        else
+                        {
+                            await client.LogAsync($"Push error: no device configured.", 3);
+                        }
+                        break;
+                    case PushActions.SendLocation:
+                        var locationService = new LocationService(client);
+                        await locationService.SendCurrentLocation();
+                        break;
+                    default: break;
                 }
             }
             catch (Exception e)

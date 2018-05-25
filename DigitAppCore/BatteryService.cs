@@ -59,7 +59,7 @@ namespace DigitAppCore
                     };
                     try
                     {
-                        await digitServiceClient.Device["12345"].Battery.AddMeasurement(measurement);
+                        await digitServiceClient.Device["12345"].Battery.AddMeasurementAsync(measurement);
                         ApplicationData.Current.LocalSettings.Values[BatteryMeasurementTimerKey] = EveryNthTime;
                         return true;
                     }
